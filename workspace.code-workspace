@@ -1,0 +1,13 @@
+{
+  "folders": [
+    {
+      "path": "auth"
+    },
+    {
+      "path": "data"
+    },
+    {
+      "path": "k8s"
+    }
+  ]
+}
