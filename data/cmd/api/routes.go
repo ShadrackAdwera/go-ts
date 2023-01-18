@@ -1,3 +1,23 @@
 package main
 
-func Routes() {}
+import (
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
+)
+
+func (app *Config) Routes() http.Handler {
+	mux := chi.NewRouter()
+
+	mux.Use(cors.Handler(cors.Options{}))
+
+	mux.Use(middleware.Heartbeat("/ping"))
+	mux.Get("/data", app.GetData)
+	mux.Post("/data", app.PostData)
+	mux.Patch("/data/:id", app.PatchData)
+	mux.Delete("/data/:id", app.DeleteData)
+
+	return mux
+}
