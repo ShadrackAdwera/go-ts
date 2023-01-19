@@ -14,10 +14,11 @@ func (app *Config) Routes() http.Handler {
 	mux.Use(cors.Handler(cors.Options{}))
 
 	mux.Use(middleware.Heartbeat("/ping"))
+	// TODO: use auth middleware here . . .
 	mux.Get("/data", app.GetData)
 	mux.Post("/data", app.PostData)
-	mux.Patch("/data/:id", app.PatchData)
-	mux.Delete("/data/:id", app.DeleteData)
+	mux.Patch("/data", app.PatchData)   // mux.Patch("/data/:id", app.PatchData)
+	mux.Delete("/data", app.DeleteData) // mux.Delete("/data/:id", app.DeleteData)
 
 	return mux
 }
