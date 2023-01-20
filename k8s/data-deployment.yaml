@@ -15,6 +15,9 @@ spec:
       containers:
         - name: go-ts-data-service
           image: "adwera/go-ts-data-service"
+          env:
+            - name: DATA_MONGO_URI
+              value: 'mongodb://data-mongo:27017/data'
           resources:
             requests:
               memory: "64Mi"
