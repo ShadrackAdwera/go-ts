@@ -1,1 +1,45 @@
-# data mongo deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-mongo
+  template:
+    metadata:
+      labels:
+        app: data-mongo
+    spec:
+      containers:
+        - name: data-mongo
+          image: "mongo:4.2.16-bionic"
+          env:
+          - name: MONGO_INITDB_DATABASE
+            value: "data"
+          - name: MONGO_INITDB_ROOT_USERNAME
+            value: "admin"
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            value: "password"
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-mongo
+spec:
+  selector:
+    app: data-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
