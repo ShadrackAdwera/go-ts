@@ -15,6 +15,9 @@ spec:
       containers:
         - name: go-ts-auth-service
           image: "adwera/go-ts-auth-service"
+          env:
+            - name: MONGO_URI
+              value: 'mongodb://auth-mongo-service:27017/auth'
           resources:
             requests:
               memory: "64Mi"

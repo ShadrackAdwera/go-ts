@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,8 +14,7 @@ import (
 )
 
 const (
-	webPort  = "5001"
-	mongoURL = "mongodb://mongo:27017"
+	webPort = "5001"
 )
 
 type Config struct {
@@ -60,6 +60,7 @@ func main() {
 
 func connectToMongo() (*mongo.Client, error) {
 	// create connection options
+	mongoURL := os.Getenv("DATA_MONGO_URI")
 	clientOptions := options.Client().ApplyURI(mongoURL)
 	clientOptions.SetAuth(options.Credential{
 		Username: "admin",
