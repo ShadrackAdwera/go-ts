@@ -19,8 +19,8 @@ passport.use(
   new GoogleStrategy(
     {
       callbackURL: `${BASE_URL}/auth/google/callback`,
-      clientID: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientID: process.env.GOTS_CLIENT_ID!,
+      clientSecret: process.env.GOTS_CLIENT_SECRET!,
       proxy: true,
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -36,7 +36,7 @@ passport.use(
           username: profile.displayName,
           email:
             profile.emails && profile.emails.length > 0
-              ? profile.emails.toString()
+              ? profile.emails.map((e) => e.value).toString()
               : '',
         }).save();
         // send to RabbitMQ
