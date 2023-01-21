@@ -1,4 +1,3 @@
-import { checkAuth } from '@adwesh/common';
 import { Router } from 'express';
 import passport from 'passport';
 
@@ -9,7 +8,14 @@ import {
   logOut,
 } from './../controllers/user-controllers';
 
+import checkAuth from '../middlewares/checkAuth';
+
 const router = Router();
+
+router.get(
+  '/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
 
 router.get(
   '/google/callback',
