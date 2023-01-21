@@ -1,11 +1,12 @@
-import { HttpError } from '@adwesh/common';
 import express, { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import session, { SessionOptions } from 'express-session';
 import MongoStore from 'connect-mongo';
 
 import { authRoutes } from './routes/user-routes';
+import { HttpError } from '@adwesh/common';
 import { COOKIE_MAX_AGE } from './utils/constants';
+import './utils/Passport';
 
 const app = express();
 
@@ -22,6 +23,13 @@ const sess: SessionOptions = {
   store: new MongoStore({
     collectionName: 'session',
     mongoUrl: process.env.MONGO_URI,
+    dbName: 'auth',
+    mongoOptions: {
+      auth: {
+        username: 'admin',
+        password: 'password',
+      },
+    },
   }),
 };
 
@@ -35,16 +43,19 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use('/auth', authRoutes);
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  throw new HttpError('Invalid Method / Route', 404);
+app.use((_req: Request, _res: Response, _next: NextFunction) => {
+  throw new HttpError('This method / route does not exist!', 404);
 });
 
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  if (res.headersSent) return next(error);
-  res.status(error instanceof HttpError ? error.code : 500).json({
-    message:
-      error instanceof HttpError ? error.message : 'Internal Server Error',
-  });
-});
+app.use(
+  (error: HttpError, _req: Request, res: Response, next: NextFunction) => {
+    if (res.headersSent) {
+      return next(error);
+    }
+    res
+      .status(error.code || 500)
+      .json({ message: error.message || 'An error occured, try again!' });
+  }
+);
 
 export { app };
