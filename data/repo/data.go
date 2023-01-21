@@ -104,19 +104,19 @@ func (p *DataEntry) GetById(id string) (*DataEntry, error) {
 	return &entry, nil
 }
 
-func (d *DataEntry) UpdateData() (*mongo.UpdateResult, error) {
+func (d *DataEntry) UpdateData(id string) (*mongo.UpdateResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*15)
 
 	defer cancel()
 
 	collection := client.Database("data").Collection("data")
 
-	docID, err := primitive.ObjectIDFromHex(d.ID)
+	docID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := collection.UpdateByID(ctx, bson.M{"_id": docID}, bson.D{
+	result, err := collection.UpdateOne(ctx, bson.M{"_id": docID}, bson.D{
 		{Key: "$set", Value: bson.D{
 			{Key: "title", Value: d.Title},
 			{Key: "description", Value: d.Description},
@@ -130,14 +130,14 @@ func (d *DataEntry) UpdateData() (*mongo.UpdateResult, error) {
 	return result, nil
 }
 
-func (d *DataEntry) Delete() (*mongo.DeleteResult, error) {
+func (d *DataEntry) Delete(id string) (*mongo.DeleteResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*15)
 
 	defer cancel()
 
 	collection := client.Database("data").Collection("data")
 
-	docId, err := primitive.ObjectIDFromHex(d.ID)
+	docId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
