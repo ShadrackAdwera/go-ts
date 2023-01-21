@@ -17,8 +17,8 @@ func (app *Config) Routes() http.Handler {
 	// TODO: use auth middleware here . . .
 	mux.Get("/data", app.GetData)
 	mux.Post("/data", app.PostData)
-	mux.Patch("/data", app.PatchData)   // mux.Patch("/data/:id", app.PatchData)
-	mux.Delete("/data", app.DeleteData) // mux.Delete("/data/:id", app.DeleteData)
+	mux.Patch("/data/{id}", app.PatchData)   // mux.Patch("/data/:id", app.PatchData)
+	mux.Delete("/data/{id}", app.DeleteData) // mux.Delete("/data/:id", app.DeleteData)
 
 	return mux
 }
