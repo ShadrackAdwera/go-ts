@@ -18,7 +18,7 @@ const logOut = (req: Request, res: Response, next: NextFunction) => {
       );
     }
   });
-  res.redirect('/login');
+  res.redirect('/auth/google');
 };
 
 const currentUser = (req: Request, res: Response, next: NextFunction) => {
