@@ -14,16 +14,33 @@ spec:
     spec:
       containers:
         - name: go-ts-auth-service
-          image: "adwera/go-ts-auth-service"
+          image: adwera/go-ts-auth-service
           env:
             - name: MONGO_URI
-              value: 'mongodb://auth-mongo-service:27017/auth'
+              value: 'mongodb://admin:password@auth-mongo-service:27017/auth?authSource=admin'
+            - name: REDIS_HOST
+              value: 'auth-redis-service'
+            - name: COOKIE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cookie-key
+                  key: COOKIE_KEY
+            - name: GOTS_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: gots-client-id
+                  key: GOTS_CLIENT_ID
+            - name: GOTS_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: gots-client-secret
+                  key: GOTS_CLIENT_SECRET 
           resources:
             requests:
-              memory: "64Mi"
+              memory: "128Mi"
               cpu: "250m"
             limits:
-              memory: "128Mi"
+              memory: "512Mi"
               cpu: "500m"
         
 ---
