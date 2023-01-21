@@ -2,7 +2,10 @@ package main
 
 import (
 	"data/repo"
+	"errors"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type JsonRequest struct {
@@ -24,7 +27,7 @@ func (app *Config) GetData(w http.ResponseWriter, r *http.Request) {
 		Data:    data,
 	}
 
-	app.writeJSON(w, http.StatusCreated, response)
+	app.writeJSON(w, http.StatusOK, response)
 }
 
 func (app *Config) PostData(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +57,28 @@ func (app *Config) PostData(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *Config) PatchData(w http.ResponseWriter, r *http.Request) {
-	data, err := app.Models.DataEntry.UpdateData()
+	id := chi.URLParam(r, "id")
+
+	if len(id) == 0 {
+		app.errJSON(w, errors.New("provide the ID"), http.StatusBadRequest)
+		return
+	}
+
+	var reqBody JsonRequest
+
+	err := app.readJSON(w, r, &reqBody)
+
+	if err != nil {
+		app.errJSON(w, err)
+		return
+	}
+
+	updatedData := &repo.DataEntry{
+		Title:       reqBody.Title,
+		Description: reqBody.Description,
+	}
+
+	data, err := updatedData.UpdateData(id)
 
 	if err != nil {
 		app.errJSON(w, err)
@@ -67,12 +91,19 @@ func (app *Config) PatchData(w http.ResponseWriter, r *http.Request) {
 		Data:    data,
 	}
 
-	app.writeJSON(w, http.StatusCreated, response)
+	app.writeJSON(w, http.StatusAccepted, response)
 }
 
 func (app *Config) DeleteData(w http.ResponseWriter, r *http.Request) {
 
-	data, err := app.Models.DataEntry.Delete()
+	id := chi.URLParam(r, "id")
+
+	if len(id) == 0 {
+		app.errJSON(w, errors.New("provide the ID"), http.StatusBadRequest)
+		return
+	}
+
+	data, err := app.Models.DataEntry.Delete(id)
 
 	if err != nil {
 		app.errJSON(w, err)
@@ -85,5 +116,5 @@ func (app *Config) DeleteData(w http.ResponseWriter, r *http.Request) {
 		Data:    data,
 	}
 
-	app.writeJSON(w, http.StatusCreated, response)
+	app.writeJSON(w, http.StatusAccepted, response)
 }
