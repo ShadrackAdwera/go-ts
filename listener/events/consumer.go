@@ -1,10 +1,17 @@
 package events
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"listener/protobufs"
+	"log"
+	"strconv"
+	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Consumer struct {
@@ -86,4 +93,35 @@ func (consumer *Consumer) Listen(topics []string) error {
 	<-forever
 
 	return nil
+}
+
+func handlePayload(payload Payload) {
+	// send auth data to data service
+	cc, err := grpc.Dial("data-service:5001", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+
+	defer cc.Close()
+
+	if err != nil {
+		return
+	}
+
+	c := protobufs.NewAuthServiceClient(cc)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+
+	defer cancel()
+
+	_, err = c.WriteAuth(ctx, &protobufs.AuthRequest{
+		AuthEntry: &protobufs.Auth{
+			UserId: payload.UserId,
+			Expiry: strconv.Itoa(payload.Expiry),
+		},
+	})
+
+	if err != nil {
+		log.Println("Error sending Auth Data via gRPC. . . ", err)
+		return
+	}
+
+	log.Println("Auth Data sent to Data Service via gRPC. . . ")
 }
