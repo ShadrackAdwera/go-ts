@@ -8,6 +8,9 @@
     },
     {
       "path": "k8s"
+    },
+    {
+      "path": "listener"
     }
   ]
 }
