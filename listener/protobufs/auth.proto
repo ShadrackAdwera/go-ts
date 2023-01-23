@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package events;
+
+option go_package = "/protobufs";
+
+message Auth {
+    string userId = 1;
+    string expiry = 2;
+}
+
+message AuthRequest {
+    Auth authEntry = 1;
+}
+
+message AuthResponse {
+    string result = 1;
+}
+
+service AuthService {
+    rpc WriteAuth (AuthRequest) returns (AuthResponse);
+}
