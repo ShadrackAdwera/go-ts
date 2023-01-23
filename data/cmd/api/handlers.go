@@ -47,6 +47,11 @@ func (app *Config) PostData(w http.ResponseWriter, r *http.Request) {
 
 	res, err := app.Models.DataEntry.Insert(reqBody)
 
+	if err != nil {
+		app.errJSON(w, err)
+		return
+	}
+
 	response := jsonResponse{
 		Error:   false,
 		Message: "Ping POST data route",
