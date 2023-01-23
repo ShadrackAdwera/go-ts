@@ -14,11 +14,13 @@ import (
 )
 
 const (
-	webPort = "5001"
+	webPort  = "5001"
+	gRPCPort = "5005"
 )
 
 type Config struct {
-	Models repo.Models
+	Models   repo.Models
+	AuthData AuthData
 }
 
 func main() {
@@ -40,13 +42,16 @@ func main() {
 	}()
 
 	app := Config{
-		Models: repo.New(client),
+		Models:   repo.New(client),
+		AuthData: AuthData{},
 	}
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", webPort),
 		Handler: app.Routes(),
 	}
+
+	go app.gRPCListen()
 
 	log.Printf("Starting DATA service on port %s\n", webPort)
 
