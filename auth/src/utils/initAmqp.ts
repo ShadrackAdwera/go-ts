@@ -3,14 +3,13 @@ import amqplib from 'amqplib/callback_api';
 
 const queue = 'auth_topic';
 
+let _conn: amqplib.Connection;
 export class AmqpClient {
-  private _conn?: amqplib.Connection;
-
-  get client() {
-    if (!this._conn) {
+  get client(): amqplib.Connection {
+    if (!_conn) {
       throw new HttpError('AMQP must be initialised', 500);
     }
-    return this._conn;
+    return _conn;
   }
 
   connect(amqpUri: string) {
@@ -20,15 +19,16 @@ export class AmqpClient {
           err instanceof HttpError ? err.message : 'error connecting to AMQP',
           500
         );
-      this._conn = connection;
+      _conn = connection;
       console.log('Connected to AMQP . . .');
     });
   }
 
   sendToQueue(data: { userId: string; expiry: number }) {
-    if (this._conn) {
-      this._conn.createChannel((err, channel) => {
+    if (_conn) {
+      _conn.createChannel((err, channel) => {
         if (err) throw err;
+        channel.assertQueue(queue);
         channel.sendToQueue(queue, Buffer.from(JSON.stringify(data)));
       });
     } else {
