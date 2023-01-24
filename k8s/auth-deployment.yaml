@@ -20,6 +20,8 @@ spec:
               value: 'mongodb://admin:password@auth-mongo-service:27017/auth?authSource=admin'
             - name: REDIS_HOST
               value: 'auth-redis-service'
+            - name: AMQP_CONNECTION_STRING
+              value: amqp://guest:guest@rabbitmq
             - name: COOKIE_KEY
               valueFrom:
                 secretKeyRef:
