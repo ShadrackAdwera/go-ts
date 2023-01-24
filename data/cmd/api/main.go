@@ -9,18 +9,21 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-redis/redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
-	webPort  = "5001"
-	gRPCPort = "5005"
+	webPort   = "5001"
+	gRPCPort  = "5005"
+	redisAddr = "auth-redis-service:6379"
 )
 
 type Config struct {
 	Models   repo.Models
 	AuthData AuthData
+	Redis    *redis.Client
 }
 
 func main() {
@@ -44,6 +47,7 @@ func main() {
 	app := Config{
 		Models:   repo.New(client),
 		AuthData: AuthData{},
+		Redis:    InitRedis(),
 	}
 
 	srv := &http.Server{
@@ -82,4 +86,13 @@ func connectToMongo() (*mongo.Client, error) {
 	log.Println("Connected to mongo!")
 
 	return c, nil
+}
+
+func InitRedis() *redis.Client {
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     redisAddr,
+		Password: "",
+		DB:       0,
+	})
+	return rdb
 }
