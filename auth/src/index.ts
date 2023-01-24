@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { app } from './app';
+import { AmqpClient } from './utils/initAmqp';
 
 if (!process.env.COOKIE_KEY) {
   throw new Error('COOKIE_KEY is not defined!');
@@ -20,6 +21,10 @@ if (!process.env.GOTS_CLIENT_SECRET) {
   throw new Error('GOTS_CLIENT_SECRET must be defined');
 }
 
+if (!process.env.AMQP_CONNECTION_STRING) {
+  throw new Error('GOTS_CLIENT_SECRET must be defined');
+}
+
 const startApp = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI!, {
@@ -29,6 +34,7 @@ const startApp = async () => {
       },
       dbName: 'auth',
     });
+    await new AmqpClient().connect(process.env.AMQP_CONNECTION_STRING!);
     app.listen(5000);
     console.log('Auth Service Started on PORT: 5000');
   } catch (error) {
