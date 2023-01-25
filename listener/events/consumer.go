@@ -25,16 +25,16 @@ type Payload struct {
 }
 
 // receiving events from RabbitMQ
-func NewConnection(conn *amqp.Connection) (Consumer, error) {
+func NewConsumer(conn *amqp.Connection) (Consumer, error) {
 	consumer := Consumer{
 		conn: conn,
 	}
 
 	err := consumer.setUp()
-
 	if err != nil {
 		return Consumer{}, err
 	}
+
 	return consumer, nil
 }
 
@@ -85,7 +85,7 @@ func (consumer *Consumer) Listen(topics []string) error {
 			var payload Payload
 			_ = json.Unmarshal(d.Body, &payload)
 
-			//go handlePayload(payload)
+			go handlePayload(payload)
 		}
 	}()
 
@@ -99,9 +99,15 @@ func handlePayload(payload Payload) {
 	// send auth data to data service
 	cc, err := grpc.Dial("data-service:5001", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	defer cc.Close()
 
 	if err != nil {
+		log.Println(err)
 		return
 	}
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"listener/events"
 	"log"
 	"math"
 	"os"
@@ -21,6 +22,17 @@ func main() {
 
 	log.Println("Listening to Messages . . .")
 
+	// create a consumer
+	consumer, err := events.NewConsumer(conn)
+	if err != nil {
+		panic(err)
+	}
+	// watch the queue and consume events
+	err = consumer.Listen([]string{"auth_topic", "auth"})
+	if err != nil {
+		log.Println(err)
+	}
+
 }
 
 func connectToRabbit() (*amqp.Connection, error) {
@@ -36,6 +48,7 @@ func connectToRabbit() (*amqp.Connection, error) {
 			log.Println("RabbitMQ is not ready . . . ")
 			count++
 		} else {
+			log.Println("RABBITMQ . . . ")
 			log.Println("Connected to RabbitMQ . . .")
 			connection = c
 			break
