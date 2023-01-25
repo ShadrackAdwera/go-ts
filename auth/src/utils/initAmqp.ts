@@ -28,7 +28,17 @@ export class AmqpClient {
     if (_conn) {
       _conn.createChannel((err, channel) => {
         if (err) throw err;
-        channel.assertQueue(queue);
+        channel.assertExchange(queue, 'topic', {
+          durable: true,
+          autoDelete: false,
+          internal: false,
+        });
+        channel.assertQueue('', {
+          durable: false,
+          exclusive: true,
+          autoDelete: false,
+        });
+
         channel.sendToQueue(queue, Buffer.from(JSON.stringify(data)));
       });
     } else {
