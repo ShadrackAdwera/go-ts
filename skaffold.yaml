@@ -23,4 +23,12 @@ build:
       sync:
         manual:
           - dest: .
-            src: 'src/**/*.go'
+            src: './**/*.go'
+    - image: adwera/gots-listener-service
+      context: listener
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: './**/*.go'
